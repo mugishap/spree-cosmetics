@@ -8,10 +8,12 @@ import com.spreecosmetics.api.v1.models.Role;
 import com.spreecosmetics.api.v1.models.User;
 import com.spreecosmetics.api.v1.payload.ApiResponse;
 import com.spreecosmetics.api.v1.repositories.IRoleRepository;
+import com.spreecosmetics.api.v1.repositories.IUserRepository;
 import com.spreecosmetics.api.v1.security.JwtTokenProvider;
 import com.spreecosmetics.api.v1.services.IFileService;
 import com.spreecosmetics.api.v1.services.IUserService;
 import com.spreecosmetics.api.v1.utils.Constants;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,15 +31,18 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/v1/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final IUserService userService;
     private static final ModelMapper modelMapper = new ModelMapper();
     private final IRoleRepository roleRepository;
+    private final IUserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final FileStorageService fileStorageService;
@@ -46,21 +51,10 @@ public class UserController {
     @Value("${uploads.directory.user_profiles}")
     private String directory;
 
-    @Autowired
-    public UserController(IUserService userService, IRoleRepository roleRepository,
-                          BCryptPasswordEncoder bCryptPasswordEncoder, JwtTokenProvider jwtTokenProvider,
-                          FileStorageService fileStorageService, IFileService fileService) {
-        this.userService = userService;
-        this.roleRepository = roleRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.fileService = fileService;
-        this.fileStorageService = fileStorageService;
-    }
 
     @GetMapping(path = "/current-user")
-    public ResponseEntity<ApiResponse> currentlyLoggedInUser(){
-        return ResponseEntity.ok(new ApiResponse(true,  userService.getLoggedInUser()));
+    public ResponseEntity<ApiResponse> currentlyLoggedInUser() {
+        return ResponseEntity.ok(new ApiResponse(true, userService.getLoggedInUser()));
     }
 
     @GetMapping
@@ -68,7 +62,7 @@ public class UserController {
         return this.userService.getAll();
     }
 
-    @GetMapping(path="/paginated")
+    @GetMapping(path = "/paginated")
     public Page<User> getAllUsers(@RequestParam(value = "page", defaultValue = Constants.DEFAULT_PAGE_NUMBER) int page,
                                   @RequestParam(value = "size", defaultValue = Constants.DEFAULT_PAGE_SIZE) int limit
     ) {
@@ -76,19 +70,25 @@ public class UserController {
         return userService.getAll(pageable);
     }
 
-    @GetMapping(path="/{id}")
+    @GetMapping(path = "/{id}")
     public ResponseEntity<User> getById(@PathVariable(value = "id") UUID id) {
         return ResponseEntity.ok(this.userService.getById(id));
     }
 
     @PostMapping(path = "/register")
-    public ResponseEntity<ApiResponse> register(@RequestBody @Valid SignUpDTO dto){
+    public ResponseEntity<ApiResponse> register(@RequestBody @Valid SignUpDTO dto) {
 
+        Optional<User> anotherUser = this.userRepository.findAnotherUser(dto.getEmail(), dto.getMobile());
+        if (anotherUser.get().getEmail().equals(dto.getEmail())) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "User with that email already exists"));
+        } else if (anotherUser.get().getMobile().equals(dto.getMobile())) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "User with that telephone already exists"));
+        }
         User user = new User();
 
         String encodedPassword = bCryptPasswordEncoder.encode(dto.getPassword());
         Role role = roleRepository.findByName(dto.getRole()).orElseThrow(
-                ()-> new BadRequestException("User Role not set"));
+                () -> new BadRequestException("User Role not set"));
 
         user.setEmail(dto.getEmail());
         user.setFirstName(dto.getFirstName());
@@ -103,7 +103,7 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse(true, entity));
     }
 
-    @PutMapping(path="/{id}/upload-profile")
+    @PutMapping(path = "/{id}/upload-profile")
     public ResponseEntity<ApiResponse> uploadProfileImage(
             @PathVariable(value = "id") UUID id,
             @RequestParam("file") MultipartFile document

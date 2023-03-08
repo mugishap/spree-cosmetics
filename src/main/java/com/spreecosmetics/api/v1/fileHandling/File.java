@@ -6,6 +6,7 @@ import com.spreecosmetics.api.v1.enums.EFileSizeType;
 import com.spreecosmetics.api.v1.enums.EFileStatus;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -18,32 +19,35 @@ import java.util.UUID;
 @Entity
 @Table(name = "files", uniqueConstraints = {@UniqueConstraint(columnNames = "path")})
 public class File extends InitiatorAudit {
+
+    @Value("${server.host}")
+    private String host;
+
     @Id
-    @GeneratedValue(generator = "fileUUID")
-    @GenericGenerator(name = "fileUUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name="id")
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    @Column(name = "id")
     private UUID id;
 
-    @Column(name="name")
+    @Column(name = "name")
     private String name;
 
-    @Column(name="path")
+    @Column(name = "path")
     private String path;
 
     @Transient
     private String url;
 
-    @Column(name="size")
+    @Column(name = "size")
     private int size;
 
-    @Column(name="size_type")
+    @Column(name = "size_type")
     @Enumerated(EnumType.STRING)
     private EFileSizeType sizeType;
 
-    @Column(name="type")
+    @Column(name = "type")
     private String type;
 
-    @Column(name="status")
+    @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private EFileStatus status;
 
@@ -53,7 +57,7 @@ public class File extends InitiatorAudit {
 
 
     public String getUrl() {
-        return "http://localhost:8080/api/v1/files/load-file/" + "/" + this.getName();
+        return host + "/api/v1/files/load-file/" + "/" + this.getName();
     }
 }
 

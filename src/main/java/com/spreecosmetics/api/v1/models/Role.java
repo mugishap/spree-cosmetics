@@ -32,4 +32,5 @@ public class Role {
         this.name = name;
         this.description = description;
     }
+
 }

@@ -32,4 +32,8 @@ public interface IUserRepository extends JpaRepository<User, UUID> {
             " OR (lower(u.lastName) LIKE ('%' || lower(:searchKey) || '%')) " +
             " OR (lower(u.email) LIKE ('%' || lower(:searchKey) || '%'))")
     Page<User> searchUser(Pageable pageable, String searchKey);
+
+
+    @Query("SELECT u FROM User u WHERE u.email=:email OR u.mobile=:telephone ")
+    Optional<User> findAnotherUser(String email, String telephone);
 }

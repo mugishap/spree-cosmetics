@@ -62,11 +62,8 @@ public class User extends TimestampAudit {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private File profileImage;
 
-
     @Column(name="activation_code")
     private String activationCode;
-
-
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))

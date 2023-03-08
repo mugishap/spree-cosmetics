@@ -62,9 +62,9 @@ public class SwaggerApiDoc extends WebMvcConfigurationSupport {
                 .pathProvider(new RelativePathProvider(servletContext) {
                     @Override
                     public String getApplicationBasePath() {
-                        return "/";
+                        return "/spreecosmetics";
                     }
-                }).select().apis(RequestHandlerSelectors.basePackage("com.java.main.springstarter.v1.controllers"))
+                }).select().apis(RequestHandlerSelectors.basePackage("com.spreecosmetics.api.v1.controllers"))
                 .paths(PathSelectors.any()).build().apiInfo(apiInfo()).securitySchemes(Arrays.asList(apiKey()))
                 .securityContexts(Collections.singletonList(securityContext()));
     }
