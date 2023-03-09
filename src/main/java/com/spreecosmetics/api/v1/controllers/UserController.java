@@ -112,7 +112,7 @@ public class UserController {
         File file = this.fileService.create(document, directory);
 
         User updated = this.userService.changeProfileImage(id, file);
-
+        System.out.println("Before closing");
         return ResponseEntity.ok(new ApiResponse(true, "File saved successfully", updated));
 
     }
@@ -126,6 +126,12 @@ public class UserController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
                 .body(file);
+    }
+
+    @DeleteMapping("/delete-profile/{user_id}")
+    public ResponseEntity<ApiResponse> removeProfile(@PathVariable(name = "user_id") UUID userId) throws Exception {
+        User user = this.userService.deleteProfile(userId);
+        return ResponseEntity.ok().body(new ApiResponse(true, "Profile image updated successfully", user));
     }
 
     private User convertDTO(SignUpDTO dto) {

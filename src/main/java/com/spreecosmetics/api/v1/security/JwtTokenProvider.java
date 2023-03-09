@@ -13,9 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class JwtTokenProvider {
@@ -30,31 +28,34 @@ public class JwtTokenProvider {
     @Value("${jwt.expiresIn}")
     private int jwtExpirationInMs;
 
-    public String generateToken(Authentication authentication){
+    public String generateToken(Authentication authentication) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime()+jwtExpirationInMs);
+        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
 
-        for (GrantedAuthority role :userPrincipal.getAuthorities()){
+        for (GrantedAuthority role : userPrincipal.getAuthorities()) {
             grantedAuthorities.add(new SimpleGrantedAuthority(role.getAuthority()));
         }
 
         User authUser = userRepository.findById(userPrincipal.getId()).get();
 
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("authorities", grantedAuthorities);
+        claims.put("user", authUser);
 
-        String token = Jwts .builder() .setId(authUser.getId()+"")
-                .setSubject(userPrincipal.getId()+"")
-                .claim("authorities", grantedAuthorities)
-                .claim("user",authUser)
+        String token = Jwts.builder().setId(authUser.getId() + "")
+                .setSubject(userPrincipal.getId() + "")
+//                .setClaims(claims)
                 .setIssuedAt(new
-                        Date(System.currentTimeMillis())) .setExpiration(expiryDate)
+                        Date(System.currentTimeMillis())).setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
-        return  token;
+
+        return token;
     }
 
 
-    public String getUserIdFromToken(String token){
+    public String getUserIdFromToken(String token) {
         Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
         return claims.getSubject();
     }

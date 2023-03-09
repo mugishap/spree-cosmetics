@@ -42,4 +42,5 @@ public interface IUserService {
 
     public User changeProfileImage(UUID id, File file);
 
+    public User deleteProfile(UUID userId) throws Exception;
 }

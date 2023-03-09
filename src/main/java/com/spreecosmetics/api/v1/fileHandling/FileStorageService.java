@@ -31,7 +31,6 @@ public class FileStorageService  {
         }
     }
 
-
     public void createSubDirectory(String directory) {
         try {
             Files.createDirectories(Paths.get(root + directory));
