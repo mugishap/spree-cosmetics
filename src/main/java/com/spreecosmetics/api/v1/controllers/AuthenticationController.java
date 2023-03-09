@@ -8,10 +8,12 @@ import com.spreecosmetics.api.v1.exceptions.AppException;
 import com.spreecosmetics.api.v1.models.User;
 import com.spreecosmetics.api.v1.payload.ApiResponse;
 import com.spreecosmetics.api.v1.payload.JwtAuthenticationResponse;
+import com.spreecosmetics.api.v1.repositories.IUserRepository;
 import com.spreecosmetics.api.v1.security.JwtTokenProvider;
 import com.spreecosmetics.api.v1.services.IUserService;
 import com.spreecosmetics.api.v1.services.MailService;
 import com.spreecosmetics.api.v1.utils.Utility;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +30,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(path = "/api/v1/auth")
+@RequiredArgsConstructor
 public class AuthenticationController {
 
     private final IUserService userService;
@@ -35,17 +38,8 @@ public class AuthenticationController {
     private final JwtTokenProvider jwtTokenProvider;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final MailService mailService;
+    private final IUserRepository userRepository;
 
-    @Autowired
-    public AuthenticationController(IUserService userService, AuthenticationManager authenticationManager,
-                                    JwtTokenProvider jwtTokenProvider, MailService mailService,
-                                    BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userService = userService;
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.mailService = mailService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
 
 
     @PostMapping(path = "/signin")
@@ -72,10 +66,10 @@ public class AuthenticationController {
         User user = this.userService.getByEmail(dto.getEmail());
         user.setActivationCode(Utility.randomUUID(6, 0, 'N'));
         user.setStatus(EUserStatus.RESET);
-
-        this.userService.create(user);
-
+        this.userRepository.save(user);
+        System.out.println("Before sending");
         mailService.sendResetPasswordMail(user.getEmail(), user.getFirstName() + " " + user.getLastName(), user.getActivationCode());
+        System.out.println("After sending");
 
         return ResponseEntity.ok(new ApiResponse(true, "Please check your mail and activate account"));
     }
@@ -90,7 +84,7 @@ public class AuthenticationController {
             user.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
             user.setActivationCode(Utility.randomUUID(6, 0, 'N'));
             user.setStatus(EUserStatus.ACTIVE);
-            this.userService.create(user);
+            this.userRepository.save(user);
         } else {
             throw new AppException("Invalid code or account status");
         }

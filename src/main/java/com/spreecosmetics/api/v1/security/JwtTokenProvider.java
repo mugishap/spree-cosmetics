@@ -40,13 +40,8 @@ public class JwtTokenProvider {
 
         User authUser = userRepository.findById(userPrincipal.getId()).get();
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("authorities", grantedAuthorities);
-        claims.put("user", authUser);
-
         String token = Jwts.builder().setId(authUser.getId() + "")
                 .setSubject(userPrincipal.getId() + "")
-//                .setClaims(claims)
                 .setIssuedAt(new
                         Date(System.currentTimeMillis())).setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
