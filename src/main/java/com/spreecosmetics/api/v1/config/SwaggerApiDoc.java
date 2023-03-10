@@ -1,6 +1,6 @@
 package com.spreecosmetics.api.v1.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -30,11 +30,10 @@ import java.util.List;
 @Configuration
 @EnableSwagger2
 @EnableWebMvc
+@RequiredArgsConstructor
 public class SwaggerApiDoc extends WebMvcConfigurationSupport {
 
-    @Autowired
-    private ServletContext servletContext;
-
+    private final ServletContext servletContext;
 
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {

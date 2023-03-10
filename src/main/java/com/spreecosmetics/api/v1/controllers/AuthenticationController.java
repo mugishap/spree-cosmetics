@@ -14,7 +14,6 @@ import com.spreecosmetics.api.v1.services.IUserService;
 import com.spreecosmetics.api.v1.services.MailService;
 import com.spreecosmetics.api.v1.utils.Utility;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -73,7 +72,6 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(new ApiResponse(true, "Please check your mail and activate account"));
     }
-
 
     @PostMapping(path = "/reset-password")
     public ResponseEntity<ApiResponse> resetPassword(@RequestBody @Valid ResetPasswordDTO dto) {

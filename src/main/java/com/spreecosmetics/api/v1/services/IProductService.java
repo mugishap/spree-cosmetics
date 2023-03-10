@@ -3,13 +3,14 @@ package com.spreecosmetics.api.v1.services;
 import com.spreecosmetics.api.v1.dtos.CreateProductDTO;
 import com.spreecosmetics.api.v1.fileHandling.File;
 import com.spreecosmetics.api.v1.models.Product;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface IProductService {
 
-    public Product createProduct(UUID id, CreateProductDTO dto);
+    public Product createProduct(CreateProductDTO dto, MultipartFile coverImage);
 
     public String deleteProduct(UUID id);
 

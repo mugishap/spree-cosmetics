@@ -4,9 +4,13 @@ import com.spreecosmetics.api.v1.dtos.CreateProductDTO;
 import com.spreecosmetics.api.v1.fileHandling.File;
 import com.spreecosmetics.api.v1.models.Product;
 import com.spreecosmetics.api.v1.repositories.IProductRepository;
+import com.spreecosmetics.api.v1.services.IFileService;
 import com.spreecosmetics.api.v1.services.IProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +19,18 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
+    @Value("${uploads.directory.user_profiles}")
+    private String directory;
 
     private final IProductRepository productRepository;
+    private final IFileService fileService;
 
     @Override
-    public Product createProduct(UUID id, CreateProductDTO dto) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public Product createProduct(CreateProductDTO dto, MultipartFile coverImage) {
+        File file = this.fileService.create(coverImage, directory);
         Product product = new Product(dto.getName(), dto.getCurrency(), dto.getPrice(), dto.getManufacturer(), dto.getManufacturedAt(), dto.getExpiresAt());
+        product.setCoverImage(file);
         return this.productRepository.save(product);
     }
 

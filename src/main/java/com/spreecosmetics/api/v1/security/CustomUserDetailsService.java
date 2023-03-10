@@ -2,7 +2,7 @@ package com.spreecosmetics.api.v1.security;
 
 import com.spreecosmetics.api.v1.models.User;
 import com.spreecosmetics.api.v1.repositories.IUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,9 +12,10 @@ import javax.transaction.Transactional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
-    @Autowired
-    private IUserRepository userRepository;
+
+    private final IUserRepository userRepository;
 
     @Transactional
     public UserDetails loadByUserId(UUID id) {

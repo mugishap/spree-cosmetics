@@ -10,7 +10,6 @@ import com.spreecosmetics.api.v1.repositories.IFileRepository;
 import com.spreecosmetics.api.v1.repositories.IUserRepository;
 import com.spreecosmetics.api.v1.services.IUserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -145,13 +144,11 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public User deleteProfile(UUID userId) throws Exception {
-        User user = this.userRepository.findById(userId).orElseThrow(() -> new Exception(("User with the id " + userId + " was not found")));
-        if (user.getProfileImage().equals(null)) {
-            return null;
-        }
-        UUID file = user.getProfileImage().getId();
-        this.fileRepository.deleteById(file);
+    public User deleteProfile() throws Exception {
+        User user = this.getLoggedInUser();
+        File file = user.getProfileImage();
+        if (file.equals(null)) return null;
+        this.fileRepository.deleteById(file.getId());
         user.setProfileImage(null);
         this.userRepository.save(user);
         return user;

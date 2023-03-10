@@ -1,9 +1,11 @@
 package com.spreecosmetics.api.v1.models;
 
+import com.spreecosmetics.api.v1.fileHandling.File;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.util.List;
@@ -42,8 +44,11 @@ public class Product {
     @Column
     private String expiresAt;
 
-    @Column
-    private String coverImage;
+    @OneToOne
+    private File coverImage;
+
+    @OneToMany
+    private List<File> images;
 
 
     public Product(String name, String currency, int price, String manufacturer, String manufacturedAt, String expiresAt) {

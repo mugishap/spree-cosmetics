@@ -9,7 +9,7 @@ import com.spreecosmetics.api.v1.fileHandling.FileStorageService;
 import com.spreecosmetics.api.v1.repositories.IFileRepository;
 import com.spreecosmetics.api.v1.services.IFileService;
 import com.spreecosmetics.api.v1.utils.FileUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,18 +27,14 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Service
-public class FileServiceImpl  implements IFileService {
+@RequiredArgsConstructor
+public class FileServiceImpl implements IFileService {
+
     private final IFileRepository fileRepository;
     private final FileStorageService fileStorageService;
 
     @Value("${uploads.extensions}")
     private String extensions;
-
-    @Autowired
-    public FileServiceImpl(IFileRepository fileRepository, FileStorageService fileStorageService) {
-        this.fileRepository = fileRepository;
-        this.fileStorageService = fileStorageService;
-    }
 
     @Override
     public List<File> getAll() {
@@ -47,7 +43,7 @@ public class FileServiceImpl  implements IFileService {
 
     @Override
     public Page<File> getAll(Pageable pageable) {
-        return  this.fileRepository.findAll(pageable);
+        return this.fileRepository.findAll(pageable);
     }
 
     @Override
@@ -103,7 +99,7 @@ public class FileServiceImpl  implements IFileService {
         assert extension != null;
         String fileBaseName = fileName.substring(
                 0,
-                fileName.length()-extension.length()-1
+                fileName.length() - extension.length() - 1
         );
         return new File(directory, fileName, extension, fileBaseName);
     }
@@ -111,10 +107,10 @@ public class FileServiceImpl  implements IFileService {
     @Override
     public String getFileExtension(String fileName) {
         int dotIndex = fileName.lastIndexOf(".");
-        if(dotIndex < 0) {
+        if (dotIndex < 0) {
             return null;
         }
-        return fileName.substring(dotIndex+1);
+        return fileName.substring(dotIndex + 1);
     }
 
     @Override
@@ -124,13 +120,13 @@ public class FileServiceImpl  implements IFileService {
         String cleanFileName = fileName.replaceAll("[^A-Za-z0-9.()]", "");
         String extension = getFileExtension(cleanFileName);
 
-        if(!isValidExtension(cleanFileName)) {
+        if (!isValidExtension(cleanFileName)) {
             throw new InvalidFileException("Invalid File Extension");
         }
 
-        String base = "image-"+id;
+        String base = "image-" + id;
 
-        cleanFileName = base+"."+extension;
+        cleanFileName = base + "." + extension;
 
         return cleanFileName;
     }
@@ -139,7 +135,6 @@ public class FileServiceImpl  implements IFileService {
     public boolean isValidExtension(String fileName)
             throws InvalidFileException {
         String fileExtension = getFileExtension(fileName);
-
 
 
         if (fileExtension == null) {

@@ -15,7 +15,6 @@ import com.spreecosmetics.api.v1.services.IUserService;
 import com.spreecosmetics.api.v1.utils.Constants;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -78,12 +77,15 @@ public class UserController {
     @PostMapping(path = "/register")
     public ResponseEntity<ApiResponse> register(@RequestBody @Valid SignUpDTO dto) {
 
-        Optional<User> anotherUser = this.userRepository.findAnotherUser(dto.getEmail(), dto.getMobile());
-        if (anotherUser.get().getEmail().equals(dto.getEmail())) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "User with that email already exists"));
-        } else if (anotherUser.get().getMobile().equals(dto.getMobile())) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "User with that telephone already exists"));
-        }
+//        Optional<User> anotherUser = this.userRepository.findAnotherUser(dto.getEmail(), dto.getMobile());
+//        if (!anotherUser.isPresent()) {
+//            if (anotherUser.get().getEmail().equals(dto.getEmail())) {
+//                return ResponseEntity.badRequest().body(new ApiResponse(false, "User with that email already exists"));
+//            } else if (anotherUser.get().getMobile().equals(dto.getMobile())) {
+//                return ResponseEntity.badRequest().body(new ApiResponse(false, "User with that telephone already exists"));
+//            }
+//        }
+
         User user = new User();
 
         String encodedPassword = bCryptPasswordEncoder.encode(dto.getPassword());
@@ -103,18 +105,16 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse(true, entity));
     }
 
-    @PutMapping(path = "/{id}/upload-profile")
+    @PutMapping(path = "/upload-profile")
     public ResponseEntity<ApiResponse> uploadProfileImage(
-            @PathVariable(value = "id") UUID id,
             @RequestParam("file") MultipartFile document
     ) {
-        this.userService.getById(id);
+        UUID id = this.userService.getLoggedInUser().getId();
         File file = this.fileService.create(document, directory);
 
         User updated = this.userService.changeProfileImage(id, file);
         System.out.println("Before closing");
         return ResponseEntity.ok(new ApiResponse(true, "File saved successfully", updated));
-
     }
 
     @GetMapping("/load-file/{filename:.+}")
@@ -128,9 +128,9 @@ public class UserController {
                 .body(file);
     }
 
-    @DeleteMapping("/delete-profile/{user_id}")
-    public ResponseEntity<ApiResponse> removeProfile(@PathVariable(name = "user_id") UUID userId) throws Exception {
-        User user = this.userService.deleteProfile(userId);
+    @DeleteMapping("/delete-profile")
+    public ResponseEntity<ApiResponse> removeProfile() throws Exception {
+        User user = this.userService.deleteProfile();
         return ResponseEntity.ok().body(new ApiResponse(true, "Profile image updated successfully", user));
     }
 

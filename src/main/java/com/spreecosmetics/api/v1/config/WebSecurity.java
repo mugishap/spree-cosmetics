@@ -3,7 +3,7 @@ package com.spreecosmetics.api.v1.config;
 import com.spreecosmetics.api.v1.security.CustomUserDetailsService;
 import com.spreecosmetics.api.v1.security.JwtAuthenticationEntryPoint;
 import com.spreecosmetics.api.v1.security.JwtAuthenticationFilter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,15 +19,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class WebSecurity extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private CustomUserDetailsService userService;
+    private final CustomUserDetailsService userService;
 
 
-    @Autowired
-    private JwtAuthenticationEntryPoint unauthorizedHandler;
+    private final JwtAuthenticationEntryPoint unauthorizedHandler;
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(){
@@ -74,7 +73,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                         "/**/*.svg", "/**/*.jpg", "/**/*.html",
                         "/**/*.css", "/**/*.js").permitAll()
                 .antMatchers(
-                        "/api/v1/auth/**", "/api/v1/users/**").permitAll()
+                        "/api/v1/auth/**", "/api/v1/users/regsiter","/api/v1/users","/api/v1/users/{id}").permitAll()
+//                .antMatchers("/api/v1/products/create").hasRole("ADMIN")
                 .antMatchers( "/v2/api-docs",
                         "/configuration/ui",
                         "/swagger-resources/**",
