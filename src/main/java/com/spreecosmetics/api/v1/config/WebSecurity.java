@@ -73,8 +73,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                         "/**/*.svg", "/**/*.jpg", "/**/*.html",
                         "/**/*.css", "/**/*.js").permitAll()
                 .antMatchers(
-                        "/api/v1/auth/**", "/api/v1/users/regsiter","/api/v1/users","/api/v1/users/{id}").permitAll()
-//                .antMatchers("/api/v1/products/create").hasRole("ADMIN")
+                        "/api/v1/auth/**").permitAll()
+                .antMatchers( "/api/v1/users/register","/api/v1/users","/api/v1/users/{id}").permitAll()
                 .antMatchers( "/v2/api-docs",
                         "/configuration/ui",
                         "/swagger-resources/**",

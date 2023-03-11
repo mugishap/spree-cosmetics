@@ -5,6 +5,7 @@ import com.spreecosmetics.api.v1.dtos.ResetPasswordDTO;
 import com.spreecosmetics.api.v1.dtos.SignInDTO;
 import com.spreecosmetics.api.v1.enums.EUserStatus;
 import com.spreecosmetics.api.v1.exceptions.AppException;
+import com.spreecosmetics.api.v1.exceptions.ResourceNotFoundException;
 import com.spreecosmetics.api.v1.models.User;
 import com.spreecosmetics.api.v1.payload.ApiResponse;
 import com.spreecosmetics.api.v1.payload.JwtAuthenticationResponse;
@@ -13,17 +14,16 @@ import com.spreecosmetics.api.v1.security.JwtTokenProvider;
 import com.spreecosmetics.api.v1.services.IUserService;
 import com.spreecosmetics.api.v1.services.MailService;
 import com.spreecosmetics.api.v1.utils.Utility;
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -38,7 +38,6 @@ public class AuthenticationController {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final MailService mailService;
     private final IUserRepository userRepository;
-
 
 
     @PostMapping(path = "/signin")
@@ -88,4 +87,5 @@ public class AuthenticationController {
         }
         return ResponseEntity.ok(new ApiResponse(true, "Password successfully reset"));
     }
+
 }

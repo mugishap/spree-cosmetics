@@ -36,4 +36,7 @@ public interface IUserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT u FROM User u WHERE u.email=:email OR u.mobile=:telephone ")
     Optional<User> findAnotherUser(String email, String telephone);
+
+    @Query("SELECT u FROM User u WHERE u.activationCode=:verificationCode")
+    Optional<User> findUserByActivationCode(String verificationCode);
 }

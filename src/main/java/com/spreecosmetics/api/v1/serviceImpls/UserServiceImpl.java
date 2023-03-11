@@ -9,6 +9,8 @@ import com.spreecosmetics.api.v1.models.User;
 import com.spreecosmetics.api.v1.repositories.IFileRepository;
 import com.spreecosmetics.api.v1.repositories.IUserRepository;
 import com.spreecosmetics.api.v1.services.IUserService;
+import com.spreecosmetics.api.v1.services.MailService;
+import com.spreecosmetics.api.v1.utils.Utility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,7 @@ public class UserServiceImpl implements IUserService {
 
     private final IUserRepository userRepository;
     private final IFileRepository fileRepository;
+    private final MailService mailService;
 
     @Override
     public List<User> getAll() {
@@ -152,5 +155,25 @@ public class UserServiceImpl implements IUserService {
         user.setProfileImage(null);
         this.userRepository.save(user);
         return user;
+    }
+
+    @Override
+    public String initiateAccountVerification() {
+        User user = this.getLoggedInUser();
+        String activationCode = Utility.randomUUID(6, 1, 'N');
+        user.setActivationCode(activationCode);
+        this.userRepository.save(user);
+        mailService.sendAccountVerificationMail(user.getEmail(), user.getFirstName() + user.getLastName(), activationCode);
+        return "Email verification email sent successfully";
+    }
+
+    @Override
+    public String verifyAccount(String token) throws Exception {
+        User user = this.userRepository.findUserByActivationCode(token)
+                .orElseThrow(() -> new Exception("User with verification token " + token + " was not found"));
+        user.setActivationCode(null);
+        user.setVerified(true);
+        this.userRepository.save(user);
+        return "Account verified successfully";
     }
 }

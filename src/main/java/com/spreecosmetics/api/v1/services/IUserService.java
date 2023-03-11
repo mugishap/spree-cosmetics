@@ -43,4 +43,9 @@ public interface IUserService {
     public User changeProfileImage(UUID id, File file);
 
     User deleteProfile() throws Exception;
+
+    public String initiateAccountVerification();
+
+    public String verifyAccount(String token) throws Exception;
+
 }

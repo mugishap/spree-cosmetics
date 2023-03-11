@@ -13,6 +13,7 @@ import com.spreecosmetics.api.v1.security.JwtTokenProvider;
 import com.spreecosmetics.api.v1.services.IFileService;
 import com.spreecosmetics.api.v1.services.IUserService;
 import com.spreecosmetics.api.v1.utils.Constants;
+import com.spreecosmetics.api.v1.utils.Utility;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -133,6 +134,19 @@ public class UserController {
         User user = this.userService.deleteProfile();
         return ResponseEntity.ok().body(new ApiResponse(true, "Profile image updated successfully", user));
     }
+
+
+    @PutMapping("/initiate-account-verification")
+    public ResponseEntity<ApiResponse> initiateAccountVerification() {
+        return ResponseEntity.ok().body(new ApiResponse(true, this.userService.initiateAccountVerification()));
+    }
+
+    @PutMapping("/verify-account")
+    public ResponseEntity<ApiResponse> verifyAccount(@RequestBody @Valid String verificationToken) throws Exception {
+        return ResponseEntity.ok().body(new ApiResponse(true, this.userService.verifyAccount(verificationToken)));
+    }
+
+
 
     private User convertDTO(SignUpDTO dto) {
         return modelMapper.map(dto, User.class);

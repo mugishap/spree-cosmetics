@@ -33,9 +33,9 @@ public class SpringStarterApplication {
         for (ERole role: roles){
             Optional<Role> roleByName = roleRepository.findByName(role);
             if(!roleByName.isPresent()){
-                System.out.println("Created: "+role.toString());
                 Role newRole = new Role(role,role.toString());
                 roleRepository.save(newRole);
+                System.out.println("Created: "+role.toString());
             }
         }
     }
