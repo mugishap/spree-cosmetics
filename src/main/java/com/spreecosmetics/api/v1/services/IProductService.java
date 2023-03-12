@@ -10,11 +10,11 @@ import java.util.UUID;
 
 public interface IProductService {
 
-    public Product createProduct(CreateProductDTO dto, MultipartFile coverImage);
+    public Product createProduct(CreateProductDTO dto, File file);
 
     public String deleteProduct(UUID id);
 
-    public Product editProduct(UUID id, CreateProductDTO dto) throws Exception;
+    public Product editProduct(UUID id, CreateProductDTO dto, File file) throws Exception;
 
     public List<Product> addMultipleProducts(List<CreateProductDTO> productDTOS);
 

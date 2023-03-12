@@ -26,9 +26,7 @@ public class ProductServiceImpl implements IProductService {
     private final IFileService fileService;
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
-    public Product createProduct(CreateProductDTO dto, MultipartFile coverImage) {
-        File file = this.fileService.create(coverImage, directory);
+    public Product createProduct(CreateProductDTO dto,File file) {
         Product product = new Product(dto.getName(), dto.getCurrency(), dto.getPrice(), dto.getManufacturer(), dto.getManufacturedAt(), dto.getExpiresAt());
         product.setCoverImage(file);
         return this.productRepository.save(product);
@@ -41,8 +39,11 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public Product editProduct(UUID id, CreateProductDTO dto) throws Exception {
-        Product product = this.productRepository.findById(id).orElseThrow(() -> new Exception("User not found"));
+    public Product editProduct(UUID id, CreateProductDTO dto, File file) throws Exception {
+        Product product = this.productRepository.findById(id).orElseThrow(() -> new Exception("Product not found"));
+        if (file != null) {
+            product.setCoverImage(file);
+        }
         product.setName(dto.getName());
         product.setCurrency(dto.getCurrency());
         product.setPrice(dto.getPrice());

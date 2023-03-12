@@ -1,11 +1,13 @@
 package com.spreecosmetics.api.v1.models;
 
+import com.spreecosmetics.api.v1.audits.TimestampAudit;
 import com.spreecosmetics.api.v1.fileHandling.File;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.lang.Nullable;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "products")
-public class Product {
+public class Product extends TimestampAudit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -44,12 +46,13 @@ public class Product {
     @Column
     private String expiresAt;
 
-    @OneToOne
+    @JoinColumn(name = "product_image_id")
+    @OneToOne(cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private File coverImage;
 
     @OneToMany
     private List<File> images;
-
 
     public Product(String name, String currency, int price, String manufacturer, String manufacturedAt, String expiresAt) {
         this.name = name;

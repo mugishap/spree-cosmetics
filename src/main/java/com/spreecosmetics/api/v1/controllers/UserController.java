@@ -78,15 +78,6 @@ public class UserController {
     @PostMapping(path = "/register")
     public ResponseEntity<ApiResponse> register(@RequestBody @Valid SignUpDTO dto) {
 
-//        Optional<User> anotherUser = this.userRepository.findAnotherUser(dto.getEmail(), dto.getMobile());
-//        if (!anotherUser.isPresent()) {
-//            if (anotherUser.get().getEmail().equals(dto.getEmail())) {
-//                return ResponseEntity.badRequest().body(new ApiResponse(false, "User with that email already exists"));
-//            } else if (anotherUser.get().getMobile().equals(dto.getMobile())) {
-//                return ResponseEntity.badRequest().body(new ApiResponse(false, "User with that telephone already exists"));
-//            }
-//        }
-
         User user = new User();
 
         String encodedPassword = bCryptPasswordEncoder.encode(dto.getPassword());
@@ -145,8 +136,6 @@ public class UserController {
     public ResponseEntity<ApiResponse> verifyAccount(@RequestBody @Valid String verificationToken) throws Exception {
         return ResponseEntity.ok().body(new ApiResponse(true, this.userService.verifyAccount(verificationToken)));
     }
-
-
 
     private User convertDTO(SignUpDTO dto) {
         return modelMapper.map(dto, User.class);
