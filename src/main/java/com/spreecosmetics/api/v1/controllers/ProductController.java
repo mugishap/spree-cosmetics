@@ -6,9 +6,13 @@ import com.spreecosmetics.api.v1.models.Product;
 import com.spreecosmetics.api.v1.payload.ApiResponse;
 import com.spreecosmetics.api.v1.services.IFileService;
 import com.spreecosmetics.api.v1.services.IProductService;
+import com.spreecosmetics.api.v1.utils.Constants;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,11 +33,28 @@ public class ProductController {
     private String directory;
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse> createProduct(@RequestBody CreateProductDTO dto, @RequestParam("file") MultipartFile coverImage) {
-        File file = this.fileService.create(coverImage, directory);
-        Product product = this.productService.createProduct(dto, file);
+    public ResponseEntity<ApiResponse> createProduct(
+//            @RequestParam("file") MultipartFile document,
+            @RequestBody CreateProductDTO dto
+    ) {
+//        File file = this.fileService.create(document, directory);
+        Product product = this.productService.createProduct(dto, null);
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/product/create").toString());
         return ResponseEntity.created(uri).body(new ApiResponse(true, "Product created successfully", product));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse> getAllProducts() {
+        return ResponseEntity.ok().body(new ApiResponse(true, "Products fetched successfully", this.productService.getAllProducts()));
+    }
+
+    @GetMapping("/paginated/all")
+    public ResponseEntity<ApiResponse> getAllProductsPaginated(
+            @RequestParam(value = "page", defaultValue = Constants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = Constants.DEFAULT_PAGE_SIZE) int limit
+    ) {
+        Pageable pageable = (Pageable) PageRequest.of(page, limit, Sort.Direction.ASC, "id");
+        return ResponseEntity.ok().body(new ApiResponse(true, "Products fetched successfully", this.productService.getAllProductsPaginated(pageable)));
     }
 
     @PutMapping("/update/{id}")

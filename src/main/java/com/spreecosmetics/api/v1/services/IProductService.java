@@ -3,6 +3,8 @@ package com.spreecosmetics.api.v1.services;
 import com.spreecosmetics.api.v1.dtos.CreateProductDTO;
 import com.spreecosmetics.api.v1.fileHandling.File;
 import com.spreecosmetics.api.v1.models.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -21,5 +23,13 @@ public interface IProductService {
     public String deleteMultipleProducts(List<UUID> productIds);
 
     public String uploadCoverImage(UUID id, File file);
+
+    public Product findById(UUID id);
+
+    public List<Product> getAllProducts();
+
+    public Page<Product> getAllProductsPaginated(Pageable pageable);
+
+    public void reduceAmounts(List<UUID> productIds);
 
 }

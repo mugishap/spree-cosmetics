@@ -1,6 +1,7 @@
 package com.spreecosmetics.api.v1.models;
 
 import com.spreecosmetics.api.v1.audits.TimestampAudit;
+import com.spreecosmetics.api.v1.enums.ECurrency;
 import com.spreecosmetics.api.v1.fileHandling.File;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,20 +26,24 @@ public class Product extends TimestampAudit {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column
+    @Column(unique = true)
     private String name;
 
     @Column
-    private String currency;
+    @Enumerated(EnumType.STRING)
+    private ECurrency currency;
 
-    @Column
+    @Column()
     private int price;
 
     @ManyToOne
-    private User addedby;
+    private User addedBy;
 
     @Column
     private String manufacturer;
+
+    @Column(columnDefinition = "1")
+    private int quantity;
 
     @Column
     private String manufacturedAt;
@@ -54,7 +59,7 @@ public class Product extends TimestampAudit {
     @OneToMany
     private List<File> images;
 
-    public Product(String name, String currency, int price, String manufacturer, String manufacturedAt, String expiresAt) {
+    public Product(String name, ECurrency currency, int price, String manufacturer, String manufacturedAt, String expiresAt) {
         this.name = name;
         this.currency = currency;
         this.price = price;

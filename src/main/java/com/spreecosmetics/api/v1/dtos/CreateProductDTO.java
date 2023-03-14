@@ -1,6 +1,7 @@
 package com.spreecosmetics.api.v1.dtos;
 
 
+import com.spreecosmetics.api.v1.enums.ECurrency;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +22,7 @@ public class CreateProductDTO {
     private String name;
 
     @NotNull
-    private String currency;
+    private ECurrency currency;
 
     @NotNull
     private int price;

@@ -1,16 +1,19 @@
 package com.spreecosmetics.api.v1.serviceImpls;
 
 import com.spreecosmetics.api.v1.dtos.CreateProductDTO;
+import com.spreecosmetics.api.v1.exceptions.ResourceNotFoundException;
 import com.spreecosmetics.api.v1.fileHandling.File;
 import com.spreecosmetics.api.v1.models.Product;
 import com.spreecosmetics.api.v1.repositories.IProductRepository;
 import com.spreecosmetics.api.v1.services.IFileService;
 import com.spreecosmetics.api.v1.services.IProductService;
+import com.spreecosmetics.api.v1.services.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +27,13 @@ public class ProductServiceImpl implements IProductService {
 
     private final IProductRepository productRepository;
     private final IFileService fileService;
+    private final IUserService userService;
 
     @Override
-    public Product createProduct(CreateProductDTO dto,File file) {
+    public Product createProduct(CreateProductDTO dto, File file) {
         Product product = new Product(dto.getName(), dto.getCurrency(), dto.getPrice(), dto.getManufacturer(), dto.getManufacturedAt(), dto.getExpiresAt());
         product.setCoverImage(file);
+        product.setAddedBy(this.userService.getLoggedInUser());
         return this.productRepository.save(product);
     }
 
@@ -74,5 +79,27 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public String uploadCoverImage(UUID id, File file) {
         return null;
+    }
+
+    @Override
+    public Product findById(UUID id) {
+        return this.productRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("Product not found"));
+    }
+
+    @Override
+    public List<Product> getAllProducts() {
+        return this.productRepository.findAll();
+    }
+
+    @Override
+    public Page<Product> getAllProductsPaginated(Pageable pageable) {
+        return this.productRepository.findAll(pageable);
+    }
+
+    @Override
+    public void reduceAmounts(List<UUID> productIds) {
+        productIds.forEach((UUID id) -> {
+            this.productRepository.reduceAmount(id);
+        });
     }
 }

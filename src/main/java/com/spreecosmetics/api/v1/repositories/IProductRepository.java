@@ -16,4 +16,7 @@ public interface IProductRepository extends JpaRepository<Product, UUID> {
     )
     public Product searchProductByName(String query);
 
+    @Query("UPDATE Product p SET p.quantity=p.quantity-1 WHERE p.id=:id")
+    public void reduceAmount(UUID id);
+
 }
