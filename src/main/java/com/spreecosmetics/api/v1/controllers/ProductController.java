@@ -34,11 +34,11 @@ public class ProductController {
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse> createProduct(
-//            @RequestParam("file") MultipartFile document,
+            @RequestParam("file") MultipartFile document,
             @RequestBody CreateProductDTO dto
     ) {
-//        File file = this.fileService.create(document, directory);
-        Product product = this.productService.createProduct(dto, null);
+        File file = this.fileService.create(document, directory);
+        Product product = this.productService.createProduct(dto, file);
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/product/create").toString());
         return ResponseEntity.created(uri).body(new ApiResponse(true, "Product created successfully", product));
     }
