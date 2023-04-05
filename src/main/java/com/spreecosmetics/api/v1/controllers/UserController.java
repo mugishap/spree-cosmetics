@@ -7,6 +7,7 @@ import com.spreecosmetics.api.v1.fileHandling.FileStorageService;
 import com.spreecosmetics.api.v1.models.Role;
 import com.spreecosmetics.api.v1.models.User;
 import com.spreecosmetics.api.v1.payload.ApiResponse;
+import com.spreecosmetics.api.v1.repositories.ICartRepository;
 import com.spreecosmetics.api.v1.repositories.IRoleRepository;
 import com.spreecosmetics.api.v1.repositories.IUserRepository;
 import com.spreecosmetics.api.v1.security.JwtTokenProvider;
@@ -93,7 +94,6 @@ public class UserController {
         user.setRoles(Collections.singleton(role));
 
         User entity = this.userService.create(user);
-
         return ResponseEntity.ok(new ApiResponse(true, entity));
     }
 

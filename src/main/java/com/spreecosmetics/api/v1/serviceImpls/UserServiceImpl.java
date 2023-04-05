@@ -5,7 +5,9 @@ import com.spreecosmetics.api.v1.enums.EUserStatus;
 import com.spreecosmetics.api.v1.exceptions.BadRequestException;
 import com.spreecosmetics.api.v1.exceptions.ResourceNotFoundException;
 import com.spreecosmetics.api.v1.fileHandling.File;
+import com.spreecosmetics.api.v1.models.Cart;
 import com.spreecosmetics.api.v1.models.User;
+import com.spreecosmetics.api.v1.repositories.ICartRepository;
 import com.spreecosmetics.api.v1.repositories.IFileRepository;
 import com.spreecosmetics.api.v1.repositories.IUserRepository;
 import com.spreecosmetics.api.v1.services.IUserService;
@@ -30,6 +32,7 @@ public class UserServiceImpl implements IUserService {
     private final IUserRepository userRepository;
     private final IFileRepository fileRepository;
     private final MailService mailService;
+    private final ICartRepository cartRepository;
 
     @Override
     public List<User> getAll() {
@@ -52,8 +55,10 @@ public class UserServiceImpl implements IUserService {
         Optional<User> userOptional = this.userRepository.findByEmail(user.getEmail());
         if (userOptional.isPresent())
             throw new BadRequestException(String.format("User with email '%s' already exists", user.getEmail()));
-
-        return this.userRepository.save(user);
+        User entity = this.userRepository.save(user);
+        Cart cart = new Cart(entity);
+        this.cartRepository.save(cart);
+        return entity;
     }
 
     @Override
